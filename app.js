@@ -1,75 +1,73 @@
-let limiteTentativas = 30;
-let listaSorteados = [];
-let tentativas = 1;
+let listaDeNumerosSorteados = [];
+let numeroLimite = 30;
 let numeroSecreto = gerarNumeroAleatorio();
+let tentativas = 1;
 
 function exibirTextoNaTela(tag, texto) {
-    const campo = document.querySelector(tag);
+    let campo = document.querySelector(tag);
     campo.innerHTML = texto;
-    responsiveVoice.speak(texto, "Brazilian Portuguese Female", {rate: 1.2});
+    responsiveVoice.speak(texto, 'Brazilian Portuguese Female', {rate:1.2});
 }
 
 function exibirMensagemInicial() {
-  exibirTextoNaTela('h1', 'Jogo do Número Secreto');
-  exibirTextoNaTela('p', `Escolha um número entre 1 e ${limiteTentativas}!`);
+    exibirTextoNaTela('h1', 'Jogo do número secreto');
+    exibirTextoNaTela('p', 'Escolha um número entre 1 e 30');
 }
+
 exibirMensagemInicial();
 
-function limparTela() {
-  const input = document.querySelector('input');
-  if (input) {
-    input.value = '';
-    input.focus();
-  }
-}
-
 function verificarChute() {
-  const input = document.querySelector('input');
-  const chute = Number(input?.value);
-
-  if (!Number.isInteger(chute) || chute < 1 || chute > limiteTentativas) {
-    exibirTextoNaTela('h1', 'Número inválido');
-    exibirTextoNaTela('p', `Digite um número entre 1 e ${limiteTentativas}.`);
-    return;
-  }
-
-  if (chute === numeroSecreto) {
-    const palavraTentativa = tentativas > 1 ? 'vezes' : 'vez';
-    const mensagemTentativas = `O número secreto é ${numeroSecreto}. Você tentou ${tentativas} ${palavraTentativa}.`;
-    exibirTextoNaTela('h1', 'Você acertou!');
-    exibirTextoNaTela('p', mensagemTentativas);
-    document.getElementById('reiniciar').removeAttribute('disabled');
-  } else {
-    exibirTextoNaTela('h1', 'Você errou!');
-    if (chute < numeroSecreto) {
-      exibirTextoNaTela('p', `O número secreto é maior que ${chute}. Tente novamente!`);
+    let chute = document.querySelector('input').value;
+    
+    if (chute == numeroSecreto) {
+        exibirTextoNaTela('h1', 'Acertou!');
+        let palavraTentativa = tentativas > 1 ? 'tentativas' : 'tentativa';
+        let mensagemTentativas = `Você descobriu o número secreto com ${tentativas} ${palavraTentativa}!`;
+        exibirTextoNaTela('p', mensagemTentativas);
+        document.getElementById('reiniciar').removeAttribute('disabled');
     } else {
-      exibirTextoNaTela('p', `O número secreto é menor que ${chute}. Tente novamente!`);
+        if (chute > numeroSecreto) {
+            exibirTextoNaTela('p', 'O número secreto é menor');
+        } else {
+            exibirTextoNaTela('p', 'O número secreto é maior');
+        }
+        tentativas++;
+        limparCampo();
     }
-    tentativas++;
-    limparTela();
-  }
 }
 
 function gerarNumeroAleatorio() {
-  if (listaSorteados.length >= limiteTentativas) {
-    listaSorteados = [];
-  }
+    let numeroEscolhido = parseInt(Math.random() * numeroLimite + 1);
+    let quantidadeDeElementosNaLista = listaDeNumerosSorteados.length;
 
-  let numeroSecreto;
-  do {
-    numeroSecreto = Math.floor(Math.random() * limiteTentativas) + 1; // 1..limite
-  } while (listaSorteados.includes(numeroSecreto));
+    if (quantidadeDeElementosNaLista == numeroLimite) {
+        listaDeNumerosSorteados = [];
+    }
+    if (listaDeNumerosSorteados.includes(numeroEscolhido)) {
+        return gerarNumeroAleatorio();
+    } else {
+        listaDeNumerosSorteados.push(numeroEscolhido);
+        console.log(listaDeNumerosSorteados)
+        return numeroEscolhido;
+    }
+}
 
-  listaSorteados.push(numeroSecreto);
-  console.log('Já sorteados:', listaSorteados);
-  return numeroSecreto;
+function limparCampo() {
+    chute = document.querySelector('input');
+    chute.value = '';
 }
 
 function reiniciarJogo() {
-  numeroSecreto = gerarNumeroAleatorio();
-  tentativas = 1;
-  exibirMensagemInicial();
-  document.getElementById('reiniciar').setAttribute('disabled', true);
-  limparTela();
+    numeroSecreto = gerarNumeroAleatorio();
+    limparCampo();
+    tentativas = 1;
+    exibirMensagemInicial();
+    document.getElementById('reiniciar').setAttribute('disabled', true)
 }
+
+
+
+
+
+
+
